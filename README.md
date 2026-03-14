@@ -108,3 +108,25 @@ GET  /api/status?detail=true — Authenticated full diagnostics (requires ADMIN_
 ## License
 
 MIT — Built by [FTH Trading](https://github.com/FTHTrading) for the [Unykorn](https://unykorn.org) ecosystem.
+
+---
+
+## System Standard — Burnzy v1
+
+> Scored against [SYSTEM_STANDARD.md](SYSTEM_STANDARD.md). System rating = lowest gate score.
+
+| Gate | Score | Notes |
+|---|:---:|---|
+| **1 · Truth** | 2 | README aligned to code; status endpoint split public/authenticated; no vanity metrics |
+| **2 · Structure** | 2 | Clean route layout; TypeScript strict; api-response helpers; env-validation schema |
+| **3 · Safety** | 2 | Upstash Redis rate limiting; ADMIN_SECRET auth; secrets server-only; input validated |
+| **4 · Verification** | 2 | 0 TS errors; 26 tests passing; `npm run verify` pipeline; structured logger |
+| **5 · Credibility** | 2 | Docs match deployed system; API route annotations accurate; honest status endpoint |
+| **6 · Expansion** | 1 | env-validation created but not wired to startup; api-response helpers not yet adopted in routes |
+
+| Metric | Value |
+|---|---|
+| **Total Score** | **11 / 18** |
+| **Readiness Band** | **Beta** |
+| **Critical Blocker** | `env-validation.ts` created but not integrated into startup path |
+| **Next Highest-Value Fix** | Wire env validation to app startup + migrate routes to `api-response.ts` helpers → Gate 6 → 2 |
