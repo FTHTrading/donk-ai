@@ -7,13 +7,16 @@ import { openai, DONK_SYSTEM_PROMPT, DEFAULT_CHAT_MODEL, FALLBACK_CHAT_MODEL } f
 import { textToSpeech } from '@/lib/elevenlabs';
 import { isRateLimited, getIpKey } from '@/lib/rate-limit';
 import { truncateForTTS, stripMarkdown, nanoid } from '@/lib/utils';
+import { createLogger } from '@/lib/logger';
 import type { ChatRequest } from '@/types';
+
+const log = createLogger('api/chat');
 
 const MAX_RPM = parseInt(process.env.RATE_LIMIT_CHAT_RPM ?? '20', 10);
 
 export async function POST(req: NextRequest) {
-  // Rate limit per IP
-  if (isRateLimited(getIpKey(req.headers, 'chat'), { maxRequests: MAX_RPM, windowMs: 60_000 })) {
+  // Rate limit per IP (async — uses Upstash Redis in prod, memory fallback in dev)
+  if (await isRateLimited(getIpKey(req.headers, 'chat'), { maxRequests: MAX_RPM, windowMs: 60_000 })) {
     return NextResponse.json({ ok: false, error: 'Rate limit exceeded. Please wait a moment.' }, { status: 429 });
   }
 
@@ -74,7 +77,7 @@ export async function POST(req: NextRequest) {
         });
         audioBase64 = Buffer.from(audioBuffer).toString('base64');
       } catch (ttsErr) {
-        console.error('[chat/tts] ElevenLabs error:', ttsErr);
+        log.error('ElevenLabs TTS failed', { error: ttsErr instanceof Error ? ttsErr.message : String(ttsErr) });
         // TTS failure is non-fatal — return text-only
       }
     }

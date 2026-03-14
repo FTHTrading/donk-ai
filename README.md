@@ -25,6 +25,8 @@ Live at **[donk.unykorn.org](https://donk.unykorn.org)**
 - **ElevenLabs REST** — `eleven_multilingual_v2` model, 50+ voices
 - **Telnyx REST API** — global SMS + outbound PSTN calls
 - **Cloudflare Workers** — deployed via @opennextjs/cloudflare
+- **Upstash Redis** — distributed rate limiting (`@upstash/ratelimit`)
+- **Vitest** — 26 unit tests across 3 suites
 
 ## Quick Start
 
@@ -55,6 +57,13 @@ TELNYX_FROM_NUMBER=+1XXXXXXXXXX
 CLOUDFLARE_ACCOUNT_ID=
 CLOUDFLARE_ZONE_ID=
 
+# Admin access
+ADMIN_SECRET=your-secret-here
+
+# Rate limiting (Upstash Redis — optional, falls back to in-memory)
+UPSTASH_REDIS_REST_URL=https://xxx.upstash.io
+UPSTASH_REDIS_REST_TOKEN=AXxx...
+
 # Optional
 TELNYX_MESSAGING_PROFILE_ID=
 NEXT_PUBLIC_APP_URL=https://donk.unykorn.org
@@ -74,14 +83,27 @@ npx wrangler deploy
 ## API Routes
 
 ```
-POST /api/chat      — GPT-4o completion + optional ElevenLabs TTS
-POST /api/speak     — Raw ElevenLabs TTS → audio/mpeg binary
+POST /api/chat      — GPT-4o completion + optional ElevenLabs TTS (rate-limited)
+POST /api/speak     — Raw ElevenLabs TTS → audio/mpeg binary (rate-limited)
 GET  /api/voices    — List ElevenLabs voices + credit usage
-POST /api/sms       — Send SMS via Telnyx
+POST /api/sms       — Send SMS via Telnyx (rate-limited)
 GET  /api/call      — List available Telnyx numbers
-POST /api/call      — Initiate outbound call via Telnyx
-GET  /api/status    — Health check all 4 API services
+POST /api/call      — Initiate outbound call via Telnyx (rate-limited)
+GET  /api/status    — Public health check (ok + timestamp)
+GET  /api/status?detail=true — Authenticated full diagnostics (requires ADMIN_SECRET)
 ```
+
+## Scripts
+
+| Script | Command | Description |
+|---|---|---|
+| Dev server | `npm run dev` | Hot-reload on port 3000 |
+| Build | `npm run build` | Production build |
+| Type check | `npm run typecheck` | TypeScript strict pass |
+| Lint | `npm run lint` | ESLint pass |
+| Test | `npm run test` | Vitest — 26 unit tests |
+| Test (watch) | `npm run test:watch` | Vitest in watch mode |
+| Full verify | `npm run verify` | Type-check → lint → test → build |
 
 ## License
 

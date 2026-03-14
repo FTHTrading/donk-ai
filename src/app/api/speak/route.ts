@@ -10,7 +10,7 @@ import type { TTSRequest } from '@/types';
 const MAX_RPM = parseInt(process.env.RATE_LIMIT_TTS_RPM ?? '10', 10);
 
 export async function POST(req: NextRequest) {
-  if (isRateLimited(getIpKey(req.headers, 'tts'), { maxRequests: MAX_RPM, windowMs: 60_000 })) {
+  if (await isRateLimited(getIpKey(req.headers, 'tts'), { maxRequests: MAX_RPM, windowMs: 60_000 })) {
     return NextResponse.json({ ok: false, error: 'Rate limit exceeded' }, { status: 429 });
   }
 

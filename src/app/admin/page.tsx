@@ -83,7 +83,8 @@ export default function AdminPage() {
   const fetchStatus = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/status');
+      // Pass detail=true for full diagnostics; admin_token cookie provides auth
+      const res = await fetch('/api/status?detail=true');
       const data = await res.json() as { ok: boolean; data?: StatusPayload };
       if (data.ok && data.data) {
         setStatus(data.data);

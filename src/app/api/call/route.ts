@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   // Calls are limited to 3/min per IP
-  if (isRateLimited(getIpKey(req.headers, 'call'), { maxRequests: 3, windowMs: 60_000 })) {
+  if (await isRateLimited(getIpKey(req.headers, 'call'), { maxRequests: 3, windowMs: 60_000 })) {
     return NextResponse.json({ ok: false, error: 'Rate limit exceeded' }, { status: 429 });
   }
 

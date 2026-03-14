@@ -1,7 +1,11 @@
 // ─────────────────────────────────────────────────────────────────────
 //  GET  /api/status — Health check + real API connectivity pings
+//
+//  Public: returns basic health (ok, timestamp, version)
+//  Authenticated: returns full provider diagnostics when
+//    ?detail=true with valid admin token
 // ─────────────────────────────────────────────────────────────────────
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 interface ServiceStatus {
   ok: boolean;
@@ -27,7 +31,37 @@ async function pingService(
   }
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  // ── Determine auth level ────────────────────────────────────────
+  const adminSecret = process.env.ADMIN_SECRET;
+  const authHeader = req.headers.get('authorization');
+  const bearerToken = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
+  const queryToken = req.nextUrl.searchParams.get('token');
+  const cookieToken = req.cookies.get('admin_token')?.value;
+
+  const isAuthenticated = adminSecret && (
+    bearerToken === adminSecret ||
+    queryToken === adminSecret ||
+    cookieToken === adminSecret
+  );
+
+  const wantDetail = req.nextUrl.searchParams.get('detail') === 'true';
+
+  // ── Public health check (no auth required) ──────────────────────
+  if (!wantDetail || !isAuthenticated) {
+    return NextResponse.json({
+      ok: true,
+      data: {
+        status: 'operational',
+        timestamp: new Date().toISOString(),
+        donkVersion: '1.0.0',
+      },
+    }, {
+      headers: { 'Cache-Control': 'no-store' },
+    });
+  }
+
+  // ── Authenticated: full provider diagnostics ────────────────────
   const [openai, elevenlabs, telnyx, cloudflare] = await Promise.all([
     // ── OpenAI: list models (lightweight) ─────────────────────────
     pingService('openai', async () => {
