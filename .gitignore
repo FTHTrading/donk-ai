@@ -1,0 +1,28 @@
+# ── Node ────────────────────────
+node_modules/
+npm-debug.log*
+
+# ── Next.js ─────────────────────
+.next/
+out/
+build/
+
+# ── Secrets — NEVER COMMIT ──────
+.env.local
+.env.*.local
+*.pem
+
+# ── Debug Logs ──────────────────
+*.log
+*.txt.log
+build-output.txt
+tsc-output.txt
+lint-output.txt
+
+# ── OS ──────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── Editor ──────────────────────
+.vscode/
+*.swp
