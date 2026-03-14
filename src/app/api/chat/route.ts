@@ -52,14 +52,26 @@ export async function POST(req: NextRequest) {
         max_tokens: 1500,
         temperature: 0.7,
       });
-    } catch {
-      // Fallback to mini model on rate limit / model error
-      completion = await openai.chat.completions.create({
-        model: FALLBACK_CHAT_MODEL,
-        messages,
-        max_tokens: 1500,
-        temperature: 0.7,
+    } catch (primaryErr) {
+      log.error('Primary model failed', {
+        error: primaryErr instanceof Error ? primaryErr.message : String(primaryErr),
+        stack: primaryErr instanceof Error ? primaryErr.stack : undefined,
       });
+      // Fallback to mini model on rate limit / model error
+      try {
+        completion = await openai.chat.completions.create({
+          model: FALLBACK_CHAT_MODEL,
+          messages,
+          max_tokens: 1500,
+          temperature: 0.7,
+        });
+      } catch (fallbackErr) {
+        log.error('Fallback model also failed', {
+          error: fallbackErr instanceof Error ? fallbackErr.message : String(fallbackErr),
+          stack: fallbackErr instanceof Error ? fallbackErr.stack : undefined,
+        });
+        throw fallbackErr;
+      }
     }
 
     const content = completion.choices[0]?.message?.content ?? '(no response)';

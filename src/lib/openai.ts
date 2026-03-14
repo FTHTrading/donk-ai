@@ -13,7 +13,10 @@ export function getOpenAI(): OpenAI {
     if (!apiKey) {
       throw new Error('Missing OPENAI_API_KEY environment variable');
     }
-    _openai = new OpenAI({ apiKey });
+    // Explicitly pass globalThis.fetch so the SDK uses the Workers-native
+    // fetch implementation instead of trying Node.js networking (which
+    // causes "Connection error." on Cloudflare Workers).
+    _openai = new OpenAI({ apiKey, fetch: globalThis.fetch });
   }
   return _openai;
 }
