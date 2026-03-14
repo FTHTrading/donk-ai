@@ -8,8 +8,10 @@ out/
 build/
 
 # ── Secrets — NEVER COMMIT ──────
+.env
 .env.local
 .env.*.local
+.env.production
 *.pem
 
 # ── Debug Logs ──────────────────
