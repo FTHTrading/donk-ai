@@ -1,0 +1,15 @@
+# ── Donk AI — Cloudflare Workers Configuration ──────────────────────
+name = "donk-ai"
+main = ".open-next/worker.js"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+
+[assets]
+directory = ".open-next/assets"
+binding = "ASSETS"
+
+[vars]
+NEXT_PUBLIC_APP_NAME = "Donk AI"
+NEXT_PUBLIC_APP_URL = "https://donk.unykorn.org"
+NEXT_PUBLIC_BRAND_PARENT = "Unykorn Media"
+NEXT_PUBLIC_BRAND_URL = "https://unykorn.org"

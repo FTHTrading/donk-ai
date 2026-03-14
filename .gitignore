@@ -26,3 +26,6 @@ Thumbs.db
 # ── Editor ──────────────────────
 .vscode/
 *.swp
+
+# OpenNext build output
+.open-next/
