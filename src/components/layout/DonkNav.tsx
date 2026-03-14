@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Brain, Mic, MessageSquare, Phone, Settings, ExternalLink, Zap } from 'lucide-react';
+import { Brain, Mic, MessageSquare, Phone, ExternalLink, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const NAV_LINKS = [
@@ -10,7 +10,6 @@ const NAV_LINKS = [
   { href: '/voice', label: 'Voice', icon: Mic,            color: 'text-accent-cyan' },
   { href: '/sms',   label: 'SMS',   icon: MessageSquare,  color: 'text-accent-green'},
   { href: '/call',  label: 'Call',  icon: Phone,          color: 'text-accent-gold' },
-  { href: '/admin', label: 'Admin', icon: Settings,        color: 'text-[#7b82b4]'  },
 ];
 
 export function DonkNav() {

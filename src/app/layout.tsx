@@ -34,15 +34,26 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <div className="relative z-10 flex flex-col min-h-screen">
             <DonkNav />
             <main className="flex-1">{children}</main>
-            <footer className="border-t border-[#2a2d4a] py-6 px-6 text-center text-sm text-[#7b82b4]">
-              <span>Donk AI is part of the&nbsp;</span>
-              <a href="https://unykorn.org" className="text-donk-400 hover:text-donk-300 font-medium" target="_blank" rel="noopener noreferrer">
-                Unykorn
-              </a>
-              <span>&nbsp;ecosystem &mdash; Built by&nbsp;</span>
-              <a href="https://github.com/FTHTrading" className="text-donk-400 hover:text-donk-300 font-medium" target="_blank" rel="noopener noreferrer">
-                FTH Trading
-              </a>
+            <footer className="border-t border-[#2a2d4a] py-8 px-6 text-sm text-[#7b82b4]">
+              <div className="max-w-7xl mx-auto space-y-6">
+                {/* Top row – links */}
+                <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+                  <a href="https://unykorn.org" className="hover:text-donk-300 transition-colors" target="_blank" rel="noopener noreferrer">Unykorn.org</a>
+                  <a href="https://github.com/FTHTrading/donk-ai" className="hover:text-donk-300 transition-colors" target="_blank" rel="noopener noreferrer">GitHub</a>
+                  <a href="/admin" className="hover:text-donk-300 transition-colors">System Status</a>
+                  <a href="mailto:kevan@unykorn.org" className="hover:text-donk-300 transition-colors">Contact</a>
+                  <a href="mailto:kevan@unykorn.org?subject=Donk%20AI%20—%20Bug%20Report" className="hover:text-donk-300 transition-colors">Report an Issue</a>
+                </div>
+
+                {/* Divider */}
+                <div className="border-t border-[#2a2d4a]" />
+
+                {/* Bottom row – copyright + legal */}
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-[#5a5e7a]">
+                  <span>&copy; {new Date().getFullYear()} FTH Trading &mdash; Donk AI is part of the Unykorn ecosystem.</span>
+                  <span>No data is stored. No tracking cookies. Open beta.</span>
+                </div>
+              </div>
             </footer>
           </div>
         </div>
