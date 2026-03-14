@@ -44,7 +44,7 @@ const STATS = [
   { label: 'AI Models',    value: 'GPT-4o' },
   { label: 'TTS Voices',   value: '50+' },
   { label: 'SMS Countries',value: '180+' },
-  { label: 'Uptime',       value: '99.9%' },
+  { label: 'Providers',    value: '4' },
 ];
 
 export default function HomePage() {

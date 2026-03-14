@@ -105,7 +105,6 @@ export async function GET() {
       cloudflare,
       envChecks,
       timestamp:   new Date().toISOString(),
-      uptime:      99.9,
       donkVersion: '1.0.0',
     },
   }, {

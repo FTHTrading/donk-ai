@@ -18,12 +18,13 @@ Live at **[donk.unykorn.org](https://donk.unykorn.org)**
 
 ## Stack
 
-- **Next.js 14** App Router + TypeScript strict mode
+- **Next.js 15** App Router + TypeScript strict mode
+- **React 19** — latest concurrent features
 - **Tailwind CSS** — custom dark theme, glass morphism
 - **OpenAI SDK** v4 — GPT-4o, streaming-ready
 - **ElevenLabs REST** — `eleven_multilingual_v2` model, 50+ voices
 - **Telnyx REST API** — global SMS + outbound PSTN calls
-- **Cloudflare API** — DNS, zones, Workers management
+- **Cloudflare Workers** — deployed via @opennextjs/cloudflare
 
 ## Quick Start
 
@@ -59,13 +60,16 @@ TELNYX_MESSAGING_PROFILE_ID=
 NEXT_PUBLIC_APP_URL=https://donk.unykorn.org
 ```
 
-## Deploy to Vercel
+## Deploy to Cloudflare Workers
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/FTHTrading/donk-ai)
+```bash
+npm run build
+npx wrangler deploy
+```
 
-1. Import this repo into Vercel
-2. Add all environment variables from `.env.example`
-3. Add a Cloudflare CNAME: `donk → cname.vercel-dns.com`
+1. Ensure all secrets are set via `wrangler secret put <KEY>`
+2. DNS is already configured at `donk.unykorn.org`
+3. Uses `@opennextjs/cloudflare` for Next.js on Workers
 
 ## API Routes
 

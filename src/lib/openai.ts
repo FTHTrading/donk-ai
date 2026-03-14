@@ -1,15 +1,29 @@
 // ─────────────────────────────────────────────────────────────────────
 //  OpenAI Client — GPT-4o chat + streaming
+//  Uses lazy initialization to avoid crashing the app on import
+//  when OPENAI_API_KEY is not set.
 // ─────────────────────────────────────────────────────────────────────
 import OpenAI from 'openai';
 
-if (!process.env.OPENAI_API_KEY) {
-  throw new Error('Missing OPENAI_API_KEY environment variable');
+let _openai: OpenAI | null = null;
+
+export function getOpenAI(): OpenAI {
+  if (!_openai) {
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey) {
+      throw new Error('Missing OPENAI_API_KEY environment variable');
+    }
+    _openai = new OpenAI({ apiKey });
+  }
+  return _openai;
 }
 
-export const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+/** @deprecated Use getOpenAI() instead — kept for backward compatibility */
+export const openai = {
+  get chat() { return getOpenAI().chat; },
+  get completions() { return getOpenAI().completions; },
+  get models() { return getOpenAI().models; },
+} as unknown as OpenAI;
 
 // System prompt for Donk AI personality
 export const DONK_SYSTEM_PROMPT = `You are Donk AI, an intelligent, fast, and friendly AI assistant built by Unykorn.
