@@ -12,11 +12,17 @@ interface ServiceStatus {
   credits?: number;
 }
 
+interface EnvCheck {
+  set: boolean;
+  required: boolean;
+}
+
 interface StatusPayload {
   openai:      ServiceStatus;
   elevenlabs:  ServiceStatus;
   telnyx:      ServiceStatus;
   cloudflare:  ServiceStatus;
+  envChecks:   Record<string, EnvCheck>;
   timestamp:   string;
   uptime:      number;
   donkVersion: string;
@@ -207,16 +213,23 @@ export default function AdminPage() {
                 </tr>
               </thead>
               <tbody>
-                {[
-                  { name: 'OPENAI_API_KEY',                ok: true,  note: 'Required — GPT-4o access'             },
-                  { name: 'ELEVENLABS_API_KEY',            ok: true,  note: 'Required — TTS synthesis'             },
-                  { name: 'TELNYX_API_KEY',                ok: true,  note: 'Required — SMS & calls'               },
-                  { name: 'TELNYX_FROM_NUMBER',            ok: false, note: 'Set your Telnyx number (+1XXXXXXXXXX)' },
-                  { name: 'CLOUDFLARE_API_TOKEN',          ok: true,  note: 'Required — DNS/zones'                 },
-                  { name: 'CLOUDFLARE_ACCOUNT_ID',         ok: false, note: 'Get from CF dashboard sidebar'        },
-                  { name: 'CLOUDFLARE_ZONE_ID',            ok: false, note: 'Get from CF → unykorn.org → Overview' },
-                  { name: 'TELNYX_MESSAGING_PROFILE_ID',  ok: false, note: 'Optional — advanced routing only'     },
-                ].map((row) => (
+                {(status?.envChecks
+                  ? Object.entries(status.envChecks).map(([name, check]) => ({
+                      name,
+                      ok:   check.set,
+                      note: check.required ? 'Required' : 'Optional',
+                    }))
+                  : [
+                      { name: 'OPENAI_API_KEY',               ok: false, note: 'Required — GPT-4o access'             },
+                      { name: 'ELEVENLABS_API_KEY',           ok: false, note: 'Required — TTS synthesis'             },
+                      { name: 'TELNYX_API_KEY',               ok: false, note: 'Required — SMS & calls'               },
+                      { name: 'TELNYX_FROM_NUMBER',           ok: false, note: 'Required — Telnyx number (+1XXXXXXXXXX)' },
+                      { name: 'CLOUDFLARE_API_TOKEN',         ok: false, note: 'Required — DNS/zones'                 },
+                      { name: 'CLOUDFLARE_ACCOUNT_ID',        ok: false, note: 'Optional — CF dashboard sidebar'      },
+                      { name: 'CLOUDFLARE_ZONE_ID',           ok: false, note: 'Optional — CF zone overview'          },
+                      { name: 'TELNYX_MESSAGING_PROFILE_ID', ok: false, note: 'Optional — advanced routing'           },
+                    ]
+                ).map((row) => (
                   <tr key={row.name} className="border-b border-[#2a2d4a]/50 hover:bg-[#111325]/50 transition-colors">
                     <td className="py-2.5 px-3 font-mono text-xs text-donk-300">{row.name}</td>
                     <td className="py-2.5 px-3">

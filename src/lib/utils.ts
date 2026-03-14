@@ -5,12 +5,14 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-/** Generate a random ID (csprng-based) */
+/** Generate a random ID */
 export function nanoid(len = 12): string {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const bytes = new Uint8Array(len);
+  crypto.getRandomValues(bytes);
   let result = '';
   for (let i = 0; i < len; i++) {
-    result += chars[Math.floor(Math.random() * chars.length)];
+    result += chars[bytes[i] % chars.length];
   }
   return result;
 }
