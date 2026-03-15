@@ -5,6 +5,7 @@ import { MessageSquare, Send, CheckCircle2, AlertCircle, Loader2, Brain, Sparkle
 import { Button } from '@/components/ui/button';
 import { Input, Textarea } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { useWallet } from '@solana/wallet-adapter-react';
 import type { SMSResponse } from '@/types';
 
 const TEMPLATES = [
@@ -38,6 +39,7 @@ export default function SMSPage() {
   const [error, setError]         = useState<string | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
   const [aiPrompt, setAiPrompt]   = useState('');
+  const { publicKey } = useWallet();
 
   const MAX = 1600;
 
@@ -50,7 +52,10 @@ export default function SMSPage() {
     try {
       const res = await fetch('/api/sms', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(publicKey && { 'X-Wallet-Address': publicKey.toBase58() }),
+        },
         body: JSON.stringify({ to: to.trim(), message: message.trim() }),
       });
       const data = await res.json() as { ok: boolean; data?: SMSResponse; error?: string };

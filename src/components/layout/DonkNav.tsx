@@ -1,9 +1,13 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Brain, Mic, MessageSquare, Phone, ExternalLink, Zap } from 'lucide-react';
+import { Brain, Mic, MessageSquare, Phone, Zap, Coins } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { ConnectWallet } from '@/components/wallet/ConnectWallet';
+import { BuyCreditsModal } from '@/components/wallet/BuyCreditsModal';
+import { useWallet } from '@solana/wallet-adapter-react';
 
 const NAV_LINKS = [
   { href: '/chat',  label: 'Chat',  icon: Brain,          color: 'text-donk-400'    },
@@ -14,6 +18,8 @@ const NAV_LINKS = [
 
 export function DonkNav() {
   const pathname = usePathname();
+  const [showBuyCredits, setShowBuyCredits] = useState(false);
+  const { connected } = useWallet();
 
   return (
     <header className="sticky top-0 z-50 glass border-b border-[#2a2d4a]">
@@ -56,20 +62,17 @@ export function DonkNav() {
           </nav>
 
           {/* Right side */}
-          <div className="flex items-center gap-3">
-            <div className="hidden sm:flex items-center gap-1.5 text-xs text-[#7b82b4]">
-              <span className="w-1.5 h-1.5 rounded-full bg-accent-green animate-pulse-slow" />
-              <span>Operational</span>
-            </div>
-            <a
-              href="https://unykorn.org"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1 text-xs text-[#7b82b4] hover:text-donk-300 transition-colors"
-            >
-              Unykorn
-              <ExternalLink className="w-3 h-3" />
-            </a>
+          <div className="flex items-center gap-2">
+            {connected && (
+              <button
+                onClick={() => setShowBuyCredits(true)}
+                className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-accent-gold/10 border border-accent-gold/30 text-accent-gold hover:bg-accent-gold/20 transition-all active:scale-95"
+              >
+                <Coins className="w-3.5 h-3.5" />
+                Buy Credits
+              </button>
+            )}
+            <ConnectWallet />
           </div>
         </div>
 
@@ -95,6 +98,9 @@ export function DonkNav() {
           })}
         </div>
       </div>
+
+      {/* Buy Credits Modal */}
+      <BuyCreditsModal open={showBuyCredits} onClose={() => setShowBuyCredits(false)} />
     </header>
   );
 }

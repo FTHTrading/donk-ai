@@ -5,6 +5,7 @@ import { Brain, Send, Volume2, VolumeX, Loader2, RefreshCw, Copy, Check, Trash2 
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/input';
 import { cn, nanoid, formatTimestamp } from '@/lib/utils';
+import { useWallet } from '@solana/wallet-adapter-react';
 import type { ChatMessage } from '@/types';
 
 const SUGGESTED = [
@@ -23,6 +24,7 @@ export default function ChatPage() {
   const [voice, setVoice]       = useState(false);
   const [copied, setCopied]     = useState<string | null>(null);
   const [error, setError]       = useState<string | null>(null);
+  const { publicKey } = useWallet();
 
   const bottomRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -46,7 +48,10 @@ export default function ChatPage() {
     try {
       const res = await fetch('/api/chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(publicKey && { 'X-Wallet-Address': publicKey.toBase58() }),
+        },
         body: JSON.stringify({
           messages: [...messages, userMsg].map(({ role, content: c }) => ({ role, content: c })),
           voice,
@@ -79,7 +84,7 @@ export default function ChatPage() {
     } finally {
       setLoading(false);
     }
-  }, [input, loading, messages, voice]);
+  }, [input, loading, messages, voice, publicKey]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {

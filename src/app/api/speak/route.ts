@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { textToSpeech } from '@/lib/elevenlabs';
 import { isRateLimited, getIpKey } from '@/lib/rate-limit';
 import { truncateForTTS, stripMarkdown } from '@/lib/utils';
+import { checkFeatureAccess } from '@/lib/auth-guard';
 import type { TTSRequest } from '@/types';
 
 const MAX_RPM = parseInt(process.env.RATE_LIMIT_TTS_RPM ?? '10', 10);
@@ -13,6 +14,10 @@ export async function POST(req: NextRequest) {
   if (await isRateLimited(getIpKey(req.headers, 'tts'), { maxRequests: MAX_RPM, windowMs: 60_000 })) {
     return NextResponse.json({ ok: false, error: 'Rate limit exceeded' }, { status: 429 });
   }
+
+  // Credit / free-tier check (voice = 5 credits)
+  const auth = await checkFeatureAccess(req, 'voice');
+  if (!auth.allowed) return auth.response!;
 
   let body: TTSRequest;
   try {

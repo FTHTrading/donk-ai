@@ -8,6 +8,7 @@ import { textToSpeech } from '@/lib/elevenlabs';
 import { isRateLimited, getIpKey } from '@/lib/rate-limit';
 import { truncateForTTS, stripMarkdown, nanoid } from '@/lib/utils';
 import { createLogger } from '@/lib/logger';
+import { checkFeatureAccess } from '@/lib/auth-guard';
 import type { ChatRequest } from '@/types';
 
 const log = createLogger('api/chat');
@@ -19,6 +20,10 @@ export async function POST(req: NextRequest) {
   if (await isRateLimited(getIpKey(req.headers, 'chat'), { maxRequests: MAX_RPM, windowMs: 60_000 })) {
     return NextResponse.json({ ok: false, error: 'Rate limit exceeded. Please wait a moment.' }, { status: 429 });
   }
+
+  // Credit / free-tier check
+  const auth = await checkFeatureAccess(req, 'chat');
+  if (!auth.allowed) return auth.response!;
 
   let body: ChatRequest;
   try {

@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { sendSMS } from '@/lib/telnyx';
 import { isRateLimited, getIpKey } from '@/lib/rate-limit';
 import { toE164 } from '@/lib/utils';
+import { checkFeatureAccess } from '@/lib/auth-guard';
 import type { SMSRequest } from '@/types';
 
 const MAX_RPM = parseInt(process.env.RATE_LIMIT_SMS_RPM ?? '5', 10);
@@ -13,6 +14,10 @@ export async function POST(req: NextRequest) {
   if (await isRateLimited(getIpKey(req.headers, 'sms'), { maxRequests: MAX_RPM, windowMs: 60_000 })) {
     return NextResponse.json({ ok: false, error: 'Rate limit exceeded' }, { status: 429 });
   }
+
+  // Credit check (SMS = 10 credits, no free tier)
+  const auth = await checkFeatureAccess(req, 'sms');
+  if (!auth.allowed) return auth.response!;
 
   let body: SMSRequest;
   try {

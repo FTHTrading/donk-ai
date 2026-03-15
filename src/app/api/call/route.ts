@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { initiateCall, listAvailableNumbers } from '@/lib/telnyx';
 import { isRateLimited, getIpKey } from '@/lib/rate-limit';
 import { toE164 } from '@/lib/utils';
+import { checkFeatureAccess } from '@/lib/auth-guard';
 import type { CallRequest } from '@/types';
 
 export async function GET(req: NextRequest) {
@@ -24,6 +25,10 @@ export async function POST(req: NextRequest) {
   if (await isRateLimited(getIpKey(req.headers, 'call'), { maxRequests: 3, windowMs: 60_000 })) {
     return NextResponse.json({ ok: false, error: 'Rate limit exceeded' }, { status: 429 });
   }
+
+  // Credit check (Call = 15 credits, no free tier)
+  const auth = await checkFeatureAccess(req, 'call');
+  if (!auth.allowed) return auth.response!;
 
   let body: CallRequest;
   try {

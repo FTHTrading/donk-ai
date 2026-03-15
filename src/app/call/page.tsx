@@ -5,6 +5,7 @@ import { Phone, PhoneCall, CheckCircle2, AlertCircle, Loader2 } from 'lucide-rea
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { useWallet } from '@solana/wallet-adapter-react';
 import type { CallResponse } from '@/types';
 
 const USE_CASES = [
@@ -19,6 +20,7 @@ export default function CallPage() {
   const [loading, setLoading] = useState(false);
   const [result, setResult]   = useState<CallResponse | null>(null);
   const [error, setError]     = useState<string | null>(null);
+  const { publicKey } = useWallet();
 
   const initiateCall = async () => {
     if (!to.trim() || loading) return;
@@ -29,7 +31,10 @@ export default function CallPage() {
     try {
       const res = await fetch('/api/call', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(publicKey && { 'X-Wallet-Address': publicKey.toBase58() }),
+        },
         body: JSON.stringify({ to: to.trim() }),
       });
       const data = await res.json() as { ok: boolean; data?: CallResponse; error?: string };

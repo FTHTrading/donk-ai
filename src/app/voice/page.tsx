@@ -5,6 +5,7 @@ import { Mic, Play, Pause, Download, RefreshCw, Loader2, Volume2, Star } from 'l
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { useWallet } from '@solana/wallet-adapter-react';
 import type { Voice } from '@/types';
 
 const EXAMPLE_TEXTS = [
@@ -35,6 +36,7 @@ export default function VoicePage() {
   const [audioDur, setAudioDur]   = useState<number | null>(null);
   const [error, setError]         = useState<string | null>(null);
   const [credits, setCredits]     = useState<number | null>(null);
+  const { publicKey } = useWallet();
 
   const audioRef = useRef<HTMLAudioElement>(null);
 
@@ -58,7 +60,10 @@ export default function VoicePage() {
     try {
       const res = await fetch('/api/speak', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(publicKey && { 'X-Wallet-Address': publicKey.toBase58() }),
+        },
         body: JSON.stringify({ text, voiceId: selectedVoice.voice_id }),
       });
 
