@@ -1,31 +1,35 @@
-# ── Node ────────────────────────
+# Node
 node_modules/
 npm-debug.log*
 
-# ── Next.js ─────────────────────
+# Next.js
 .next/
 out/
 build/
 
-# ── Secrets — NEVER COMMIT ──────
+# Secrets - NEVER COMMIT THESE
 .env
-.env.local
-.env.*.local
-.env.production
+.env.*
+.env*.local
+!.env.example
 *.pem
+*.key
+*-keypair.json
+*-wallet.json
+*secret*.json
 
-# ── Debug Logs ──────────────────
+# Debug Logs
 *.log
 *.txt.log
 build-output.txt
 tsc-output.txt
 lint-output.txt
 
-# ── OS ──────────────────────────
+# OS
 .DS_Store
 Thumbs.db
 
-# ── Editor ──────────────────────
+# Editor
 .vscode/
 *.swp
 
